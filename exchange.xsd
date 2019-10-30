@@ -13,8 +13,8 @@
 	</xs:simpleType>
 	<xs:complexType name="Документ">
 		<xs:sequence>
-			<xs:element name="Продавец" type="tns:Организация"/>
-			<xs:element name="Покупатель" type="tns:Организация"/>
+			<xs:element name="Продавец" type="tns:Организация" minOccurs="0"/>
+			<xs:element name="Покупатель" type="tns:Организация" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="Номер" type="xs:string" use="required"/>
 		<xs:attribute name="Дата" type="xs:date" use="required"/>
@@ -34,7 +34,7 @@
 		<xs:complexContent>
 			<xs:extension base="tns:Документ">
 				<xs:sequence>
-					<xs:element name="Грузополучатель" type="tns:Организация"/>
+					<xs:element name="Грузополучатель" type="tns:Организация" minOccurs="0"/>
 					<xs:element name="СчетФактура" type="tns:Документ"/>
 					<xs:element name="Товар" maxOccurs="unbounded">
 						<xs:complexType>
