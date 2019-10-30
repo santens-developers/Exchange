@@ -1,1 +1,127 @@
-
+<xs:schema xmlns:tns="http://www.santens.ru/exchange" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.santens.ru/exchange" attributeFormDefault="unqualified" elementFormDefault="qualified">
+	<xs:complexType name="ГТД">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Страна" type="tns:Страна" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="Деньги">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="Документ">
+		<xs:sequence>
+			<xs:element name="Продавец" type="tns:Организация"/>
+			<xs:element name="Покупатель" type="tns:Организация"/>
+		</xs:sequence>
+		<xs:attribute name="Номер" type="xs:string" use="required"/>
+		<xs:attribute name="Дата" type="xs:date" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="Количество">
+		<xs:restriction base="xs:unsignedLong"/>
+	</xs:simpleType>
+	<xs:complexType name="Организация">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="ИНН" type="xs:unsignedLong" use="required"/>
+				<xs:attribute name="КПП" type="xs:unsignedLong" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="ПТУ">
+		<xs:complexContent>
+			<xs:extension base="tns:Документ">
+				<xs:sequence>
+					<xs:element name="Грузополучатель" type="tns:Организация"/>
+					<xs:element name="СчетФактура" type="tns:Документ"/>
+					<xs:element name="Товар" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:complexContent>
+								<xs:extension base="tns:Товар">
+									<xs:sequence>
+										<xs:element name="ЗаказОснование" type="tns:Документ" minOccurs="0"/>
+										<xs:element name="Количество" type="tns:Количество"/>
+										<xs:element name="СтавкаНДС" type="tns:СтавкаНДС"/>
+										<xs:element name="Цена" type="tns:Цена"/>
+										<xs:element name="ГТД" type="tns:ГТД"/>
+										<xs:element name="СертификатСоответствия" type="tns:СертификатСоответствия" maxOccurs="unbounded"/>
+									</xs:sequence>
+								</xs:extension>
+							</xs:complexContent>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Производитель">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Страна" type="tns:Страна" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Серия">
+		<xs:sequence>
+			<xs:element name="ДатаИстеченияСрокаГодности" type="xs:date"/>
+			<xs:element name="ДатаИзготовления" type="xs:date"/>
+		</xs:sequence>
+		<xs:attribute name="Код" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="СертификатСоответствия">
+		<xs:sequence>
+			<xs:element name="РегистрационныйНомер" type="xs:string"/>
+			<xs:element name="ОрганРегистрации" type="xs:string"/>
+			<xs:element name="ОрганВыдачи" type="xs:string"/>
+			<xs:element name="Декларант" type="xs:string"/>
+			<xs:element name="ДатаВыдачи" type="xs:date"/>
+			<xs:element name="ДатаНачалаДействия" type="xs:date"/>
+			<xs:element name="ДатаОкончанияДействия" type="xs:date"/>
+		</xs:sequence>
+		<xs:attribute name="Безсрочный" type="xs:boolean" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="СтавкаНДС">
+		<xs:restriction base="xs:unsignedShort">
+			<xs:enumeration value="0"/>
+			<xs:enumeration value="10"/>
+			<xs:enumeration value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Страна">
+		<xs:restriction base="tns:Строка">
+			<xs:length value="2"/>
+			<xs:minLength value="2"/>
+			<xs:maxLength value="2"/>
+			<xs:enumeration value="RU"/>
+			<xs:enumeration value="EN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Строка">
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="Товар">
+		<xs:sequence>
+			<xs:element name="Код" type="xs:string"/>
+			<xs:element name="Наименование" type="xs:string"/>
+			<xs:element name="Серия" type="tns:Серия"/>
+			<xs:element name="Производитель" type="tns:Производитель"/>
+			<xs:element name="Штрихкод" type="xs:unsignedLong" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="УникальныйИдентификатор" type="tns:УникальныйИдентификатор" use="required"/>
+	</xs:complexType>
+	<xs:simpleType name="УникальныйИдентификатор">
+		<xs:restriction base="tns:Строка"/>
+	</xs:simpleType>
+	<xs:complexType name="Цена">
+		<xs:sequence>
+			<xs:element name="ЦенаГосРеестра" type="tns:Деньги"/>
+			<xs:element name="ЦенаПроизводителя" type="tns:Деньги"/>
+		</xs:sequence>
+		<xs:attribute name="ВключаетНДС" type="xs:boolean"/>
+		<xs:attribute name="Значение" type="tns:Деньги" use="required"/>
+	</xs:complexType>
+</xs:schema>
